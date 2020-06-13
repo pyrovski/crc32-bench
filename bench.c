@@ -54,10 +54,10 @@ int main(int argc, char **argv) {
 
   double run = ((double) res.tv_sec*1000000 + res.tv_usec) / 1000000;
   double avg = run/rounds;
-  double throughput = buflen / avg;
+  uint32_t throughput = buflen / avg/1024.0/1024.0;
 
-  printf("crc 0x%08" PRIx32 ", runtime %.2f (avg %.5f, %f Bps)\n", crc, run, avg,
-		 throughput);
+    printf("crc 0x%08" PRIx32 ", runtime %.2f (avg %.5f, %"PRIu32" MiBps)\n", crc, run, avg,
+	   throughput);
 
   const uint32_t expected = 0x3fb6c98;
   if (crc != expected) {

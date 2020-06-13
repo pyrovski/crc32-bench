@@ -7,11 +7,10 @@
 void crc32_init(void);
 void crc32_shutdown(void);
 
-uint32_t crc32(uint32_t, uint8_t *, size_t);
 uint32_t crc32_copy(uint32_t, uint8_t *, size_t, uint8_t*);
 
 #define BUFLEN (64*1024*1024)
-#define ROUNDS (100)
+#define ROUNDS (10)
 
 int main(int argc, char **argv) {
     int buflen = 0;
@@ -55,7 +54,7 @@ int main(int argc, char **argv) {
 
     double run = ((double) res.tv_sec*1000000 + res.tv_usec) / 1000000;
     double avg = run/rounds;
-    uint32_t throughput = (double)buflen / avg/1024.0/1024.0;
+    uint32_t throughput = buflen / avg/1024.0/1024.0;
 
     crc32_shutdown();
 
