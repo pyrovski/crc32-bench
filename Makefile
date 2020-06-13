@@ -1,12 +1,14 @@
 CC=gcc
 CXX=g++
-CFLAGS=-Wall -Werror -ggdb -O3 -march=sandybridge -mtune=intel
+CFLAGS=-Wall -Werror -ggdb -O3 -march=native -mtune=native
 CXXFLAGS=$(CFLAGS)
 
-BENCHES=bench-zlib bench-slice4 bench-slice8 bench-slice16 bench-slice16-prefetch bench-kernel bench-oldcyrus bench-cyrus
+BENCHES=bench-zlib bench-slice4 bench-slice8 bench-slice16 bench-slice16-prefetch bench-kernel bench-oldcyrus bench-cyrus bench-crcutil
 
 all: $(BENCHES)
 
+bench-crcutil: crcutil.o bench.o bench-init.o
+	$(CXX) -o $@ $^ -lcrcutil
 bench-zlib: bench.o bench-init.o
 	$(CC) -o $@ $^ -lz
 bench-slice4: bench.o bench-init.o crc32-slice4.o
