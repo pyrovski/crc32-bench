@@ -14,6 +14,8 @@ information, read https://blog.fastmail.com/2015/12/03/the-search-for-a-faster-c
 - *slice4*, *slice8*, *slice16*: table-based slice-by-N, all from [Stephan Brumme's CRC32 collection](http://create.stephan-brumme.com/crc32/). Each increase in N adds more tables and unrolls loops further, relying more and more on a modern CPU's ability to parallelise work.
 - *slice16-prefetch*: same as *slice16* but with a strategically-placed instruction to force the CPU to bring the next 256 bytes into the CPU cache while it's doing the math.
 - *zlib*: system zlib.
+- *lizardfs*: LizardFS; similar to zlib.
+- *crcutil*: system crctuil.
 
 ## adding your own
 
