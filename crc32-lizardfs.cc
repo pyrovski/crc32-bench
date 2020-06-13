@@ -16,6 +16,8 @@
   along with LizardFS  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// Looks similar to zlib code.
+
 #include <inttypes.h>
 #include <stdlib.h>
 #include <cstring>
