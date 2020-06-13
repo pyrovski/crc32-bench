@@ -29,6 +29,8 @@
 
 extern "C" {
   uint32_t crc32(uint32_t prev, uint8_t * data, size_t length);
+  uint32_t crc32_copy(uint32_t prev, uint8_t const * data, size_t length,
+					  uint8_t * dest);
   void crc32_init(void);
   void crc32_shutdown(void);
 }
@@ -82,43 +84,114 @@ void crc_generate_main_tables(void) {
   }
 }
 
+inline uint32_t crc_one_byte(uint32_t crc, uint8_t b){
+#ifdef WORDS_BIGENDIAN
+  return crc_table[0][(crc >> 24) ^ b] ^ (crc << 8);
+#else // little-endian
+  return crc_table[0][(crc ^ b) & 0xFF] ^ (crc >> 8);
+#endif
+}
+
+inline uint32_t crc_one_byte_copy(uint32_t crc, uint8_t const * &src, uint8_t *&dest){
+  const uint8_t b = *src++;
+  *dest++ = b;
+  return crc_one_byte(crc, b);
+}
+
+inline uint32_t crc_four_bytes(uint32_t crc, uint32_t b4){
+  crc ^= b4;
+#ifdef WORDS_BIGENDIAN
+  return crc_table[0][crc & 0xff] ^
+	crc_table[1][(crc >> 8) & 0xff] ^
+	crc_table[2][(crc >> 16) & 0xff] ^
+	crc_table[3][crc >> 24];
+#else // little-endian
+  return crc_table[3][crc & 0xff] ^
+	crc_table[2][(crc >> 8) & 0xff] ^
+	crc_table[1][(crc >> 16) & 0xff] ^
+	crc_table[0][crc >> 24];
+#endif
+}
+
+
+inline uint32_t crc_four_bytes_copy(uint32_t crc, uint32_t const *&src,
+									uint32_t *&dest){
+  const uint32_t b4 = *src++;
+  *dest++ = b4;
+  return crc_four_bytes(crc, b4);
+}
+
+inline uint32_t crc_reorder(uint32_t crc){
+#ifdef WORDS_BIGENDIAN
+  return BYTEREV(crc) ^ 0xFFFFFFFF;
+#else /* little endian */
+  return crc ^ 0xFFFFFFFF;
+#endif
+}
+
 uint32_t crc32(uint32_t crc, uint8_t * block, size_t leng) {
   const uint32_t *block4;
-#ifdef WORDS_BIGENDIAN
-#define CRC_REORDER crc=(BYTEREV(crc))^0xFFFFFFFF
-#define CRC_ONE_BYTE crc = crc_table[0][(crc >> 24) ^ *block++] ^ (crc << 8)
-#define CRC_FOUR_BYTES crc ^= *block4++; crc = crc_table[0][crc & 0xff] ^ crc_table[1][(crc >> 8) & 0xff] ^ crc_table[2][(crc >> 16) & 0xff] ^ crc_table[3][crc >> 24]
-#else /* little endian */
-#define CRC_REORDER crc^=0xFFFFFFFF
-#define CRC_ONE_BYTE crc = crc_table[0][(crc ^ *block++) & 0xFF] ^ (crc >> 8)
-#define CRC_FOUR_BYTES crc ^= *block4++; crc = crc_table[3][crc & 0xff] ^ crc_table[2][(crc >> 8) & 0xff] ^ crc_table[1][(crc >> 16) & 0xff] ^ crc_table[0][crc >> 24]
-#endif
-  CRC_REORDER;
+  crc = crc_reorder(crc);
   while (leng && ((unsigned long)block & 3)) {
-    CRC_ONE_BYTE;
+	crc = crc_one_byte(crc, *block++);
     leng--;
   }
   block4 = (const uint32_t*)block;
   while (leng>=32) {
-    CRC_FOUR_BYTES;
-    CRC_FOUR_BYTES;
-    CRC_FOUR_BYTES;
-    CRC_FOUR_BYTES;
-    CRC_FOUR_BYTES;
-    CRC_FOUR_BYTES;
-    CRC_FOUR_BYTES;
-    CRC_FOUR_BYTES;
+	crc = crc_four_bytes(crc, *block4++);
+	crc = crc_four_bytes(crc, *block4++);
+	crc = crc_four_bytes(crc, *block4++);
+	crc = crc_four_bytes(crc, *block4++);
+	crc = crc_four_bytes(crc, *block4++);
+	crc = crc_four_bytes(crc, *block4++);
+	crc = crc_four_bytes(crc, *block4++);
+	crc = crc_four_bytes(crc, *block4++);
     leng-=32;
   }
   while (leng>=4) {
-    CRC_FOUR_BYTES;
+	crc = crc_four_bytes(crc, *block4++);
     leng-=4;
   }
   block = (uint8_t*)block4;
   if (leng) do {
-      CRC_ONE_BYTE;
+	  crc = crc_one_byte(crc, *block++);
     } while (--leng);
-  CRC_REORDER;
+  crc = crc_reorder(crc);
+  return crc;
+}
+
+uint32_t crc32_copy(uint32_t crc, uint8_t const * block, size_t leng,
+					uint8_t * dest) {
+  const uint32_t *block4;
+  uint32_t *dest4;
+  crc = crc_reorder(crc);
+  while (leng && ((unsigned long)block & 3)) {
+	crc = crc_one_byte_copy(crc, block, dest);
+	leng--;
+  }
+  block4 = (const uint32_t*)block;
+  dest4 = (uint32_t*)dest;
+  while (leng>=32) {
+	crc = crc_four_bytes_copy(crc, block4, dest4);
+	crc = crc_four_bytes_copy(crc, block4, dest4);
+	crc = crc_four_bytes_copy(crc, block4, dest4);
+	crc = crc_four_bytes_copy(crc, block4, dest4);
+	crc = crc_four_bytes_copy(crc, block4, dest4);
+	crc = crc_four_bytes_copy(crc, block4, dest4);
+	crc = crc_four_bytes_copy(crc, block4, dest4);
+	crc = crc_four_bytes_copy(crc, block4, dest4);
+	leng-=32;
+  }
+  while (leng>=4) {
+	crc = crc_four_bytes_copy(crc, block4, dest4);
+	leng-=4;
+  }
+  block = (uint8_t*)block4;
+  dest = (uint8_t*)dest4;
+  if (leng) do {
+	  crc = crc_one_byte_copy(crc, block, dest);
+	} while (--leng);
+  crc = crc_reorder(crc);
   return crc;
 }
 

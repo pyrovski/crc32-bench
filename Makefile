@@ -7,6 +7,8 @@ BENCHES=bench-zlib bench-slice4 bench-slice8 bench-slice16 bench-slice16-prefetc
 
 all: $(BENCHES)
 
+bench-copy: crc32-lizardfs.o bench-copy.o
+	$(CXX) -o $@ $^
 bench-lizardfs: crc32-lizardfs.o bench.o
 	$(CXX) -o $@ $^
 bench-crcutil: crcutil.o bench.o bench-init.o
