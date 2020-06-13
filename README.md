@@ -6,6 +6,9 @@ This was built so we could test CRC32 performance with a view to replacing the
 implementation used inside [Cyrus IMAP](https://cyrusimap.org/). For more
 information, read https://blog.fastmail.com/2015/12/03/the-search-for-a-faster-crc32/
 
+## Warnings
+Broken on 64-bit architectures?
+
 ## Implementations
 
 - *oldcyrus*: The old, slow fallback implementation from Cyrus.

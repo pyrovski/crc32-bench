@@ -1,7 +1,7 @@
 CC=gcc
-CXX=g++ -std=c++11
+CXX=g++
 CFLAGS=-Wall -Werror -ggdb -O3 -march=native -mtune=native
-CXXFLAGS=$(CFLAGS)
+CXXFLAGS=$(CFLAGS)  -std=c++11
 
 BENCHES=bench-zlib bench-slice4 bench-slice8 bench-slice16 bench-slice16-prefetch bench-kernel bench-oldcyrus bench-cyrus bench-crcutil bench-lizardfs bench-copy
 
