@@ -6,10 +6,10 @@
 void crc32_init(void);
 void crc32_shutdown(void);
 
-unsigned long crc32(unsigned long, unsigned char *, unsigned long);
+uint32_t crc32(uint32_t, uint8_t *, size_t);
 
 #define BUFLEN (64*1024*1024)
-#define ROUNDS (100)
+#define ROUNDS (10)
 
 int main(int argc, char **argv) {
     int buflen = 0;
