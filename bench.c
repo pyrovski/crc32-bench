@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
         buflen = BUFLEN;
 
     if (buflen / sizeof(long int) * sizeof(long int) != buflen) {
-        printf("buflen must be multiple of %d\n", sizeof(long int));
+        printf("buflen must be multiple of %zu\n", sizeof(long int));
         return 1;
     }
 
