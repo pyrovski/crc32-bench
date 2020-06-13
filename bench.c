@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
         buflen = BUFLEN;
 
     if (buflen / sizeof(long int) * sizeof(long int) != buflen) {
-        printf("buflen must be multiple of %ld\n", sizeof(long int));
+        printf("buflen must be multiple of %d\n", sizeof(long int));
         return 1;
     }
 
@@ -51,8 +51,10 @@ int main(int argc, char **argv) {
 
     double run = ((double) res.tv_sec*1000000 + res.tv_usec) / 1000000;
     double avg = run/rounds;
+    double throughput = buflen / avg;
 
-    printf("crc 0x%lx, runtime %.2f (avg %.5f)\n", crc, run, avg);
+    printf("crc 0x%lx, runtime %.2f (avg %.5f, %f Bps)\n", crc, run, avg,
+	   throughput);
 
     crc32_shutdown();
 
