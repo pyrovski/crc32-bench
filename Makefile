@@ -3,7 +3,7 @@ CXX=g++
 CFLAGS=-Wall -Werror -ggdb -O3 -march=native -mtune=native
 CXXFLAGS=$(CFLAGS)  -std=c++11
 
-BENCHES=bench-zlib bench-slice4 bench-slice8 bench-slice16 bench-slice16-prefetch bench-kernel bench-oldcyrus bench-cyrus bench-crcutil bench-lizardfs bench-copy
+BENCHES=bench-zlib bench-slice4 bench-slice8 bench-slice16 bench-slice16-prefetch bench-kernel bench-oldcyrus bench-cyrus bench-crcutil bench-crcutil-blockword bench-lizardfs bench-copy
 
 all: $(BENCHES)
 
@@ -12,6 +12,8 @@ bench-copy: crc32-lizardfs.o bench-copy.o
 bench-lizardfs: crc32-lizardfs.o bench.o
 	$(CXX) -o $@ $^
 bench-crcutil: crcutil.o bench.o bench-init.o
+	$(CXX) -o $@ $^ -lcrcutil
+bench-crcutil-blockword: crcutil_blockword.o bench.o bench-init.o
 	$(CXX) -o $@ $^ -lcrcutil
 bench-zlib: bench.o bench-init.o
 	$(CC) -o $@ $^ -lz
