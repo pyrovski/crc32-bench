@@ -123,9 +123,9 @@ inline uint32_t crc_four_bytes_copy(uint32_t crc, uint32_t const *&src,
 
 inline uint32_t crc_reorder(uint32_t crc){
 #ifdef WORDS_BIGENDIAN
-  return BYTEREV(crc) ^ 0xFFFFFFFF;
+  return ~BYTEREV(crc);
 #else /* little endian */
-  return crc ^ 0xFFFFFFFF;
+  return ~crc;
 #endif
 }
 
