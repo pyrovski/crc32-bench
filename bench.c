@@ -19,8 +19,8 @@ int main(int argc, char **argv) {
   if (buflen <= 0)
 	buflen = BUFLEN;
 
-  if (buflen / sizeof(long int) * sizeof(long int) != buflen) {
-	printf("buflen must be multiple of %zu\n", sizeof(long int));
+  if (buflen / sizeof(uint32_t) * sizeof(uint32_t) != buflen) {
+	printf("buflen must be multiple of %zu\n", sizeof(uint32_t));
 	return 1;
   }
 
@@ -32,10 +32,11 @@ int main(int argc, char **argv) {
 
   printf("%d bytes, %d rounds\n", buflen, rounds);
 
-  long int *buf = malloc(buflen);
+  uint32_t *buf = malloc(buflen);
+  
   srand48(0);
-  for (int i = 0; i < buflen/sizeof(long int); i++)
-	buf[i] = mrand48();
+  for (int i = 0; i < buflen/sizeof(uint32_t); i++)
+	buf[i] = (uint32_t)mrand48();
 
   crc32_init();
 
@@ -44,7 +45,7 @@ int main(int argc, char **argv) {
 
   gettimeofday(&start, 0);
   for (int i = rounds; i > 0; i--)
-	crc = crc32(0, (unsigned char *) buf, buflen);
+	crc = crc32(0, (uint8_t *) buf, buflen);
   gettimeofday(&end, 0);
 
   struct timeval res;
