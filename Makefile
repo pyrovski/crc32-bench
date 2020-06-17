@@ -12,9 +12,9 @@ bench-copy: crc32-lizardfs.o bench-copy.o
 bench-lizardfs: crc32-lizardfs.o bench.o
 	$(CXX) -o $@ $^
 bench-crcutil: crcutil.o bench.o bench-init.o
-	$(CXX) -o $@ $^ -lcrcutil
+	$(CXX) -o $@ $^
 bench-crcutil-blockword: crcutil_blockword.o bench.o bench-init.o
-	$(CXX) -o $@ $^ -lcrcutil
+	$(CXX) -o $@ $^
 bench-zlib: bench.o bench-init.o
 	$(CC) -o $@ $^ -lz
 bench-slice4: bench.o bench-init.o crc32-slice4.o
