@@ -32,16 +32,17 @@ void crc32_init(void) {
         abort();
     }
 
+    const uint32_t crc = ~0;
+    if (setsockopt(alg_fd, SOL_ALG, ALG_SET_KEY, &crc, sizeof(crc)) != 0) {
+        perror("setsockopt");
+        abort();
+    }
+
     if ((crc_fd = accept(alg_fd, NULL, 0)) == -1) {
         perror("accept");
         abort();
     }
 
-    int crc = ~0;
-    if (setsockopt(alg_fd, SOL_ALG, ALG_SET_KEY, &crc, 4) != 0) {
-        perror("setsockopt");
-        abort();
-    }
 }
 
 void crc32_shutdown(void) {
