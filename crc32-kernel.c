@@ -50,13 +50,13 @@ void crc32_shutdown(void) {
     close(alg_fd);
 }
 
-unsigned long crc32(unsigned long crc, unsigned char *buf, unsigned long len) {
+uint32_t crc32(uint32_t crc /* ignored */, unsigned char *buf, size_t len) {
     if (send(crc_fd, buf, len, MSG_DONTWAIT) != len) {
         perror("send");
         abort();
     }
 
-    int crcout = 0;
+    uint32_t crcout = 0;
     if (read(crc_fd, &crcout, 4) != 4) {
         perror("read");
         abort();
