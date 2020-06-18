@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +12,7 @@
 // http://www.chronox.de/libkcapi.html
 #include <kcapi.h>
 
-static struct kcapi_handle *handle;
+static struct kcapi_handle *handle = 0;
 
 void crc32_init(void)
 {
@@ -20,6 +21,7 @@ void crc32_init(void)
     if (kcapi_md_init(&handle, "crc32", flags)) {
         abort();
     }
+    assert(handle != 0);
     const uint32_t crc = ~0;
     if (kcapi_md_setkey(handle, (uint8_t *) & crc, sizeof(crc))) {
         abort();
@@ -39,5 +41,5 @@ uint32_t crc32(uint32_t crc, unsigned char *buf, size_t len)
          sizeof(crc_out)) != sizeof(uint32_t)) {
         abort();
     }
-    return crc_out;
+    return ~crc_out;
 }

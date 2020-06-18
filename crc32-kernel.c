@@ -62,5 +62,5 @@ uint32_t crc32(uint32_t crc /* ignored */, unsigned char *buf, size_t len) {
         abort();
     }
 
-    return ~crcout & 0xffffffff;
+    return ~crcout;
 }
